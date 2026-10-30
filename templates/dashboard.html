@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifier Lens | Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body class="dashboard-page">
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <a class="brand" href="{{ url_for('dashboard') }}">
+            <span class="brand-icon">🔍</span>
+            <span class="brand-text">
+                <strong>VERIFIER <span>LENS</span></strong>
+                <small>AI News Verification</small>
+            </span>
+        </a>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-link active">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{{ url_for('news') }}" class="nav-link">
+                <span class="nav-icon">▤</span>
+                <span>News Detection</span>
+            </a>
+
+            <a href="{{ url_for('resources') }}" class="nav-link">
+                <span class="nav-icon">▣</span>
+                <span>Resources</span>
+            </a>
+
+            <a href="{{ url_for('history') }}" class="nav-link">
+                <span class="nav-icon">◷</span>
+                <span>History</span>
+            </a>
+
+            <a href="#team-section" class="nav-link">
+                <span class="nav-icon">♧</span>
+                <span>Team</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <strong>VERIFIER LENS MODEL</strong>
+            <small>News Detection System</small>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="topbar">
+
+            <button class="menu-toggle" id="menuToggle"
+                    type="button" aria-label="Toggle menu">
+                ☰
+            </button>
+
+            <div class="page-heading">
+                <h1>Dashboard</h1>
+                <p>Welcome to Verifier Lens!</p>
+            </div>
+
+            <!-- USER ICON: SAME ZUNERA IMAGE -->
+            <div class="user-menu">
+                <span class="user-avatar">
+                    <img
+                        src="{{ url_for('static', filename='images/zunera.jpg') }}"
+                        alt="Nabiji Zunera"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <span class="user-avatar-fallback">👤</span>
+                </span>
+                <span>{{ username|default('User') }}</span>
+            </div>
+
+        </header>
+
+        <div class="content-area">
+
+            <!-- HERO BANNER -->
+            <section class="hero-banner">
+                <div class="hero-copy">
+                    <p class="eyebrow">AI-POWERED NEWS VERIFICATION</p>
+
+                    <h2>
+                        Fake News &amp;<br>
+                        Resource <span>Detection System</span>
+                    </h2>
+
+                    <p class="hero-description">
+                        Analyze news content using Natural Language
+                        Processing and Machine Learning to help identify
+                        whether information is likely to be real or fake.
+                    </p>
+
+                    <a href="{{ url_for('news') }}" class="primary-button">
+                        Start Analysis <span>→</span>
+                    </a>
+                </div>
+
+                <div class="hero-visual">
+                    <span class="tech-pill pill-nlp">NLP</span>
+                    <span class="tech-pill pill-tfidf">TF-IDF</span>
+
+                    <div class="orbit orbit-one"></div>
+                    <div class="orbit orbit-two"></div>
+                    <div class="orbit orbit-three"></div>
+
+                    <div class="shield">🔍</div>
+                    <span class="tech-pill pill-model">ML Model</span>
+                </div>
+            </section>
+
+            <!-- TECHNOLOGY -->
+            <section class="panel-section">
+                <div class="section-heading">
+                    <h2><span class="heading-icon">▦</span> Technology Used</h2>
+                    <a href="{{ url_for('resources') }}" class="details-link">
+                        View Resources →
+                    </a>
+                </div>
+
+                <div class="technology-grid">
+
+                    <article class="technology-card">
+                        <div class="tech-icon blue-icon">▤</div>
+                        <div class="tech-card-content">
+                            <h3>NLP</h3>
+                            <p class="tech-subtitle">Natural Language Processing</p>
+                            <p class="tech-description">
+                                Processes and prepares news text for
+                                machine learning analysis.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="technology-card">
+                        <div class="tech-icon purple-icon">▥</div>
+                        <div class="tech-card-content">
+                            <h3>TF-IDF</h3>
+                            <p class="tech-subtitle">Text Feature Extraction</p>
+                            <p class="tech-description">
+                                Converts text into numerical features
+                                that the model can process.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="technology-card">
+                        <div class="tech-icon green-icon">♧</div>
+                        <div class="tech-card-content">
+                            <h3>Machine Learning</h3>
+                            <p class="tech-subtitle">Text Classification</p>
+                            <p class="tech-description">
+                                Uses a trained model to predict whether
+                                news is real or fake.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+            
+
+                <div class="goal-banner">
+                    <span class="goal-icon">◎</span>
+                    <strong>Our Goal</strong>
+                    <span class="goal-divider"></span>
+                    <p>
+                        Helping users evaluate news information and make
+                        more informed decisions.
+                    </p>
+                </div>
+            
+
+            <!-- TEAM SECTION -->
+            <section class="panel-section team-section" id="team-section">
+
+                <div class="team-heading">
+                    <span class="team-eyebrow">VERIFIER LENS PROJECT</span>
+                    <h2>Meet Our Team</h2>
+                    <p>The team behind Verifier Lens</p>
+                </div>
+
+                <div class="team-grid">
+
+                    <!-- ZUNERA -->
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <img
+                                src="{{ url_for('static', filename='images/zunera.jpg') }}"
+                                alt="Nabiji Zunera"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            >
+                            <span class="profile-placeholder">👤</span>
+                        </div>
+
+                        <h3>NABIJI ZUNERA</h3>
+                        <p class="team-role">Project Developer</p>
+                    </article>
+
+                    <!-- ADIBA -->
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <img
+                                src="{{ url_for('static', filename='images/adiba.jpg') }}"
+                                alt="Syeda Adiba"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            >
+                            <span class="profile-placeholder">👤</span>
+                        </div>
+
+                        <h3>SYEDA ADIBA</h3>
+                        <p class="team-role">
+                            Dataset Preparation &amp; Model Testing
+                        </p>
+                    </article>
+
+                    <!-- AFIFA -->
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <img
+                                src="{{ url_for('static', filename='images/afifa.jpg') }}"
+                                alt="Choudhary Afifa"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            >
+                            <span class="profile-placeholder">👤</span>
+                        </div>
+
+                        <h3>CHOUDHARY AFIFA</h3>
+                        <p class="team-role">
+                            Frontend Design &amp; Project Documentation
+                        </p>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="dashboard-footer">
+                <p>
+                    <strong>VERIFIER LENS MODEL</strong> —
+                    Fake News &amp; Resource Detection System
+                </p>
+                <p>BCA THIRD YEAR PROJECT</p>
+            </footer>
+
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<!-- USER ICON STYLING -->
+<style>
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #eaf0ff;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-avatar-fallback {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-placeholder {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+</style>
+
+</body>
+</html>
+
+

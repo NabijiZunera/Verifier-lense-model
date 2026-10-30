@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>News Detection | Verifier Lens</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+    <!-- EXISTING NAVBAR -->
+    <nav class="navbar">
+
+        <a class="nav-logo" href="{{ url_for('dashboard') }}">
+            <div class="nav-logo-box">V</div>
+
+            <div>
+                <h2>VERIFIER <span>LENS</span></h2>
+                <small>Fake News &amp; Resource Detection</small>
+            </div>
+        </a>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('dashboard') }}">Home</a>
+
+            <a href="{{ url_for('news') }}" class="active">
+                News Detection
+            </a>
+
+            <a href="{{ url_for('resources') }}">Resources</a>
+
+            <a href="{{ url_for('dashboard') }}#team-section">Team</a>
+
+        </div>
+    </nav>
+
+
+    <!-- NEWS DETECTION PAGE -->
+    <main class="news-page">
+
+        <!-- PAGE HEADING -->
+        <section class="news-heading">
+
+            <span class="red-label">
+                AI-POWERED NEWS VERIFICATION
+            </span>
+
+            <h1>
+                Detect <span>Fake News</span>
+            </h1>
+
+            <p>
+                Enter a news article below and let our trained
+                machine-learning model analyze its content and
+                predict whether it is classified as REAL NEWS
+                or FAKE NEWS.
+            </p>
+
+        </section>
+
+
+        <!-- HORIZONTAL TWO-COLUMN LAYOUT -->
+        <div class="news-layout">
+
+            <!-- LEFT CARD: NEWS INPUT -->
+            <section class="detection-card">
+
+                <div class="card-top">
+
+                    <div class="card-title">
+                        <span class="heading-icon">▤</span>
+
+                        <div>
+                            <span class="small-label">NEWS ANALYZER</span>
+                            <h2>Enter News Article</h2>
+                        </div>
+                    </div>
+
+                    <div class="ai-status">
+                        <span class="status-dot"></span>
+                        AI MODEL
+                    </div>
+
+                </div>
+
+
+                <!-- NEWS FORM -->
+                <form method="POST"
+                      action="{{ url_for('news') }}">
+
+                    <label for="news_text">
+                        News Content
+                    </label>
+
+                    <textarea
+                        id="news_text"
+                        name="news_text"
+                        placeholder="Paste your news headline or full article here..."
+                        required
+                        minlength="10"
+                    >{{ result.text if result else request.form.get('news_text', '') }}</textarea>
+
+
+                    <div class="input-info">
+
+                        <span>
+                            🛡 TF-IDF + Machine Learning analysis
+                        </span>
+
+                        <span>
+                            🔒 Secure Analysis
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit" class="analyze-button">
+
+                        <span class="analyze-icon">⌕</span>
+
+                        Analyze News
+
+                        <span class="arrow">→</span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- PREDICTION RESULT -->
+                {% if result %}
+
+                <div class="result-card {{ result.class }}">
+
+                    <div class="result-header">
+
+                        <span class="small-label">
+                            AI ANALYSIS RESULT
+                        </span>
+
+                        <span class="result-icon">
+                            {{ result.icon }}
+                        </span>
+
+                    </div>
+
+
+                    <h2>{{ result.label }}</h2>
+
+                    <p class="result-message">
+                        {{ result.message }}
+                    </p>
+
+
+                    <!-- CONFIDENCE SCORE -->
+                    <div class="confidence-section">
+
+                        <div class="confidence-top">
+
+                            <span>Confidence Score</span>
+
+                            <strong>{{ result.confidence }}%</strong>
+
+                        </div>
+
+
+                        <div class="confidence-bar">
+
+                            <div
+                                class="confidence-fill"
+                                style="width: {{ result.confidence }}%;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RESULT DISCLAIMER -->
+                    <div class="result-note">
+
+                        <span>AI</span>
+
+                        This result is generated by the trained
+                        machine-learning model. It is a prediction,
+                        not independent verification of the article.
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- RIGHT CARD: ANALYSIS PROCESS -->
+            <aside class="analysis-process">
+
+                <div class="process-heading">
+
+                    <span class="heading-icon">⚙</span>
+
+                    <div>
+                        <span class="small-label">
+                            OUR TECHNOLOGY
+                        </span>
+
+                        <h2>
+                            How AI Checks News
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 1 -->
+                <div class="analysis-step">
+
+                    <div class="step-number">01</div>
+
+                    <div class="step-icon">▤</div>
+
+                    <div class="step-content">
+
+                        <h3>Text Input</h3>
+
+                        <p>
+                            The user enters a news article
+                            into the system.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 2 -->
+                <div class="analysis-step">
+
+                    <div class="step-number">02</div>
+
+                    <div class="step-icon">⚙</div>
+
+                    <div class="step-content">
+
+                        <h3>TF-IDF Processing</h3>
+
+                        <p>
+                            The text is converted into numerical
+                            features using the fitted TF-IDF
+                            vectorizer.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 3 -->
+                <div class="analysis-step">
+
+                    <div class="step-number">03</div>
+
+                    <div class="step-icon">♧</div>
+
+                    <div class="step-content">
+
+                        <h3>ML Prediction</h3>
+
+                        <p>
+                            The trained machine-learning model
+                            analyzes the extracted text features.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 4 -->
+                <div class="analysis-step">
+
+                    <div class="step-number">04</div>
+
+                    <div class="step-icon">✓</div>
+
+                    <div class="step-content">
+
+                        <h3>Final Result</h3>
+
+                        <p>
+                            The application displays the predicted
+                            label and confidence score when available.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="footer-brand">
+
+            <strong>VERIFIER <span>LENS</span></strong>
+
+            <p>A News Detection System</p>
+
+        </div>
+
+
+        <div class="footer-right">
+
+            BCA THIRD YEAR CAPSTONE PROJECT
+
+            <br>
+
+            2026–27 | SEMESTER 5
+
+        </div>
+
+    </footer>
+
+</body>
+</html>
+
