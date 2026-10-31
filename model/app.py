@@ -13,98 +13,98 @@ PROJECT_DIR = os.path.dirname(BASE_DIR)
 TEMPLATE_DIR = os.path.join(PROJECT_DIR, "templates")
 STATIC_DIR = os.path.join(PROJECT_DIR, "static")
 
+MODEL_PATH = os.path.join(PROJECT_DIR, "fake_news_model.pkl")
+VECTORIZER_PATH = os.path.join(PROJECT_DIR, "tfidf_vectorizer.pkl")
+
 app = Flask(
     __name__,
     template_folder=TEMPLATE_DIR,
     static_folder=STATIC_DIR
 )
 
-app.secret_key = "verifier-lens-secret-key"
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "verifier-lens-development-key"
+)
 
 
 # ==========================================
 # 2. LOAD TRAINED MODEL AND VECTORIZER
 # ==========================================
 
-MODEL_PATH = os.path.join(PROJECT_DIR, "fake_news_model.pkl")
-VECTORIZER_PATH = os.path.join(PROJECT_DIR, "tfidf_vectorizer.pkl")
-
 model = None
 vectorizer = None
 
 try:
-    if os.path.exists(MODEL_PATH) and os.path.exists(VECTORIZER_PATH):
+    if os.path.isfile(MODEL_PATH) and os.path.isfile(VECTORIZER_PATH):
+
         model = joblib.load(MODEL_PATH)
         vectorizer = joblib.load(VECTORIZER_PATH)
 
-        print("SUCCESS: Fake news model loaded.")
-        print("SUCCESS: TF-IDF vectorizer loaded.")
+        print("SUCCESS: Fake News Model Loaded.")
+        print("SUCCESS: TF-IDF Vectorizer Loaded.")
+        print("Model Classes:", model.classes_)
 
     else:
-        print("WARNING: Model files were not found.")
-        print("Expected model:", MODEL_PATH)
-        print("Expected vectorizer:", VECTORIZER_PATH)
-        print("News prediction is currently unavailable.")
+        print("ERROR: Model files not found.")
+        print("Model Path:", MODEL_PATH)
+        print("Vectorizer Path:", VECTORIZER_PATH)
 
-except Exception as e:
-    print("ERROR loading the model:", e)
+except Exception as error:
+    print("ERROR loading trained model:", error)
     model = None
     vectorizer = None
 
 
 # ==========================================
-# 3. HELPER FUNCTION FOR PREDICTION
+# 3. NEWS PREDICTION FUNCTION
 # ==========================================
 
 def predict_news(news_text):
-    """
-    Predict whether the supplied news text is REAL or FAKE.
-
-    Assumes the trained model uses:
-        0 = FAKE
-        1 = REAL
-
-    Verify these labels against your training code.
-    """
 
     if model is None or vectorizer is None:
         return {
             "class": "unavailable",
             "icon": "⚠️",
             "label": "Model Unavailable",
-            "message": (
-                "The trained model could not be loaded. "
-                "Check that the model and vectorizer files exist."
-            ),
+            "message": "The trained model could not be loaded. Please check the model files.",
             "confidence": 0,
             "text": news_text
         }
 
     try:
-        # Convert news text into TF-IDF features
+        # Convert input text into TF-IDF features
         transformed_text = vectorizer.transform([news_text])
 
-        # Predict the class
+        # Predict news category
         prediction = model.predict(transformed_text)[0]
 
-        # Convert the predicted class into a readable label.
-        # These mappings must match your model's training labels.
-        if str(prediction).strip().lower() in ("1", "real", "true"):
+        # Normalize predicted label
+        predicted_label = str(prediction).strip().lower()
+
+        # REAL NEWS
+        if predicted_label in ("real", "1", "true"):
+
             label = "REAL NEWS"
             result_class = "real"
             icon = "✅"
+
             message = (
                 "The model classified this article as real news. "
-                "This is a model prediction, not independent verification."
+                "This prediction is based on learned dataset patterns "
+                "and is not independent factual verification."
             )
 
-        elif str(prediction).strip().lower() in ("0", "fake", "false"):
+        # FAKE NEWS
+        elif predicted_label in ("fake", "0", "false"):
+
             label = "FAKE NEWS"
             result_class = "fake"
             icon = "⚠️"
+
             message = (
                 "The model classified this article as fake news. "
-                "Verify the claims using reliable sources."
+                "Please verify its claims using reliable sources."
             )
 
         else:
@@ -112,20 +112,22 @@ def predict_news(news_text):
                 "class": "unavailable",
                 "icon": "⚠️",
                 "label": "Unknown Model Label",
-                "message": (
-                    "The model returned an unfamiliar class label. "
-                    "Check the labels used during training."
-                ),
+                "message": f"The model returned an unexpected label: {prediction}",
                 "confidence": 0,
                 "text": news_text
             }
 
-        # Calculate confidence when the model supports it
+        # Calculate prediction probability
         confidence = 0
 
         if hasattr(model, "predict_proba"):
+
             probabilities = model.predict_proba(transformed_text)[0]
-            confidence = round(float(max(probabilities)) * 100, 2)
+
+            confidence = round(
+                float(max(probabilities)) * 100,
+                2
+            )
 
         return {
             "class": result_class,
@@ -136,17 +138,15 @@ def predict_news(news_text):
             "text": news_text
         }
 
-    except Exception as e:
-        print("Prediction error:", e)
+    except Exception as error:
+
+        print("PREDICTION ERROR:", error)
 
         return {
             "class": "unavailable",
             "icon": "⚠️",
             "label": "Prediction Error",
-            "message": (
-                "The model could not analyze this article. "
-                "Check the terminal for the error details."
-            ),
+            "message": "Unable to analyze this article. Please try again.",
             "confidence": 0,
             "text": news_text
         }
@@ -159,7 +159,11 @@ def predict_news(news_text):
 @app.route("/")
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html", username="User")
+
+    return render_template(
+        "dashboard.html",
+        username="User"
+    )
 
 
 # ==========================================
@@ -169,32 +173,43 @@ def dashboard():
 @app.route("/news", methods=["GET", "POST"])
 def news():
 
-    # Display the page when opened normally
     if request.method == "GET":
-        return render_template("news.html", result=None)
 
-    # Receive the submitted article
-    news_text = request.form.get("news_text", "").strip()
-
-    # Validate the input
-    if len(news_text) < 10:
         return render_template(
             "news.html",
-            result={
-                "class": "unavailable",
-                "icon": "ℹ️",
-                "label": "Article Too Short",
-                "message": "Please enter at least 10 characters.",
-                "confidence": 0,
-                "text": news_text
-            }
+            result=None
         )
 
-    # Run prediction
+    # Get submitted news article
+    news_text = request.form.get(
+        "news_text",
+        ""
+    ).strip()
+
+    # Validate article
+    if len(news_text) < 10:
+
+        result = {
+            "class": "unavailable",
+            "icon": "ℹ️",
+            "label": "Article Too Short",
+            "message": "Please enter at least 10 characters.",
+            "confidence": 0,
+            "text": news_text
+        }
+
+        return render_template(
+            "news.html",
+            result=result
+        )
+
+    # Generate prediction
     result = predict_news(news_text)
 
-    # Display prediction on the page
-    return render_template("news.html", result=result)
+    return render_template(
+        "news.html",
+        result=result
+    )
 
 
 # ==========================================
@@ -203,7 +218,11 @@ def news():
 
 @app.route("/resources")
 def resources():
-    return render_template("dashboard.html", username="User")
+
+    return render_template(
+        "dashboard.html",
+        username="User"
+    )
 
 
 # ==========================================
@@ -212,33 +231,71 @@ def resources():
 
 @app.route("/history")
 def history():
-    return render_template("dashboard.html", username="User")
+
+    return render_template(
+        "dashboard.html",
+        username="User"
+    )
 
 
 # ==========================================
-# 8. TEAM / DASHBOARD SECTION
+# 8. TEAM PAGE
 # ==========================================
 
 @app.route("/team")
 def team():
-    return redirect(url_for("dashboard") + "#team-section")
+
+    return redirect(
+        url_for("dashboard") + "#team-section"
+    )
 
 
 # ==========================================
-# 9. LOGOUT ROUTE
+# 9. LOGOUT
 # ==========================================
 
 @app.route("/logout")
 def logout():
-    return redirect(url_for("dashboard"))
+
+    return redirect(
+        url_for("dashboard")
+    )
 
 
 # ==========================================
-# 10. RUN FLASK APPLICATION
+# 10. APPLICATION HEALTH CHECK
+# ==========================================
+
+@app.route("/health")
+def health():
+
+    if model is not None and vectorizer is not None:
+
+        return {
+            "status": "healthy",
+            "model_loaded": True,
+            "vectorizer_loaded": True
+        }, 200
+
+    return {
+        "status": "error",
+        "model_loaded": False,
+        "vectorizer_loaded": False
+    }, 503
+
+
+# ==========================================
+# 11. RUN FLASK APPLICATION LOCALLY
 # ==========================================
 
 if __name__ == "__main__":
-    app.run(debug=False)
+
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=False
+    )
+
 
 
    
